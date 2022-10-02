@@ -31,16 +31,16 @@ def armor_full_file_etl(jsonRawBasePath, jsonOutBasePath):
         raw_armor_json = json.load(jsonf)
         for armor in raw_armor_json:
             out_armor = {
-                    "part": str(equip_slot_alignment.get(armor.get("Equip Slot"))),
+                    "part": equip_slot_alignment.get(armor.get("Equip Slot")),
                     "skills": [],
-                    "name": str(armor.get("Name")),
+                    "name": armor.get("Name"),
                     "slots": [
-                        armor.get("Slot 1 size"),
-                        armor.get("Slot 2 size"),
-                        armor.get("Slot 3 size")
+                        int(armor.get("Slot 1 size")),
+                        int(armor.get("Slot 2 size")),
+                        int(armor.get("Slot 3 size"))
                     ],
-                    "rank": str(armor.get("Variant")),
-                    "set": str(armor.get("Set Skill 1").split(": ")[0])
+                    "rank": armor.get("Variant"),
+                    "set": armor.get("Set Skill 1").split(": ")[0]
             }
             for i in range(1, 4):
                 key_name = "Skill " + str(i)
@@ -48,8 +48,8 @@ def armor_full_file_etl(jsonRawBasePath, jsonOutBasePath):
                 if skill and not skill.startswith('0:'):
                     out_armor["skills"].append(
                         {
-                            "name": str(skill.split(': ')[1]),
-                            "level": armor.get("Skill " + str(i) + " Level")
+                            "name": skill.split(': ')[1],
+                            "level": int(armor.get("Skill " + str(i) + " Level"))
                         }
                     )
 
@@ -57,7 +57,7 @@ def armor_full_file_etl(jsonRawBasePath, jsonOutBasePath):
 
     out_armor_path = os.path.join(jsonOutBasePath, armor_folder, out_file_name)
     with open(out_armor_path, "w", encoding='utf-8') as jsonf:
-        jsonf.write(json.dumps(out_json, indent=4))
+        json.dump(out_json, jsonf, indent = 4)
 
 
 
