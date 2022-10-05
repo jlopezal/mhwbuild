@@ -1,10 +1,14 @@
 import csv
 import json
 import os
+from site import abs_paths
+
+from utils import base_path, data_folder_dict
+from utils import checkMigrationFolderStruct, createMigrationFolderStruct
 
 csv_ext = '.csv'
 json_ext = '.json'
- 
+
 def to_json(csv_base_path, json_base_path):
 
     data = []
@@ -14,13 +18,13 @@ def to_json(csv_base_path, json_base_path):
     
     for file in files:
 
-        csv_file_path = os.path.join(csv_base_path, file + csv_ext)
-        with open(csv_file_path) as csvf:
+        csv_file_path = os.path.join(csv_base_path, (file + csv_ext))
+        with open(csv_file_path, 'r', encoding='utf-8-sig') as csvf:
             csv_reader = csv.DictReader(csvf, delimiter=',')
             for row in csv_reader:
                 data.append(row)
 
-        json_file_path = os.path.join(json_base_path, file + json_ext)
+        json_file_path = os.path.join(json_base_path, (file + json_ext))
         with open(json_file_path, 'w', encoding='utf-8') as jsonf:
             jsonf.write(json.dumps(data, indent=4))
 
@@ -29,17 +33,29 @@ def to_json(csv_base_path, json_base_path):
 
 def get_files(path) -> list:
 
-    filenames = []
+    out_paths = []
 
-    for filename in os.listdir(path):
-        if os.path.isfile(os.path.join(path, filename)):
-            filenames.append(filename.split('.')[0])
+    elements = os.listdir(path)
+    for i, e in enumerate(elements):
+        elements[i] = os.path.abspath(os.path.join(path, e))
+    for e in elements:
+        if os.path.isfile(e):
+            out_paths.append(os.path.abspath(e))
+        # if os.path.isdir(e):
+        #     elements.append(os.path.abspath(e))
 
-    return filenames
+    # Normalize output paths
+    delimiter = path
+    for i, e in enumerate(out_paths):
+        out_paths[i] = e.split(delimiter.replace(".", ""))[1].split('.')[0].replace("\\", "").replace("/", "")
+
+    return out_paths
 
 
-csvBasePath = r'.\\baseFiles'
-jsonBasePath = r'.\\rawFiles'
+csvBasePath = os.path.join(base_path, data_folder_dict.get("csvSF").get("root"))
+jsonBasePath = os.path.join(base_path, data_folder_dict.get("jsonSF").get("root"))
 
+if not checkMigrationFolderStruct():
+    createMigrationFolderStruct()
 
 to_json(csvBasePath, jsonBasePath)
