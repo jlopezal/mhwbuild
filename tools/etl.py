@@ -1,6 +1,9 @@
 import os
 import json
 
+from utils import base_path, data_folder_dict
+from utils import checkMigrationFolderStruct, createMigrationFolderStruct, find
+
 def weapon_full_file_etl(jsonRawBasePath, jsonOutBasePath):
 
     weapon_folder = 'weapons'
@@ -8,9 +11,9 @@ def weapon_full_file_etl(jsonRawBasePath, jsonOutBasePath):
 
     pass
 
-def armor_full_file_etl(jsonRawBasePath, jsonOutBasePath):
+def armor_full_file_etl(jsbp, ndbp):
 
-    armor_folder = 'armors'
+    # armor_folder = 'armors'
     armor_file = 'Armaduras_Charm.json'
     # set_folder = 'sets'
 
@@ -22,11 +25,13 @@ def armor_full_file_etl(jsonRawBasePath, jsonOutBasePath):
         "Chest": "chest",
         "Arms": "arm",
         "Waist": "waist",
-        "Legs": "leg"
-
+        "Legs": "leg",
+        "Charm": "charm"
     }
 
-    raw_armor_path = os.path.join(jsonRawBasePath, armor_folder, armor_file)
+    find(armor_file, jsbp)
+
+    raw_armor_path = os.path.join(jsbp, armor_file)
     with open(raw_armor_path, 'r', encoding='utf-8') as jsonf:
         raw_armor_json = json.load(jsonf)
         for armor in raw_armor_json:
@@ -55,7 +60,7 @@ def armor_full_file_etl(jsonRawBasePath, jsonOutBasePath):
 
             out_json.append(out_armor)
 
-    out_armor_path = os.path.join(jsonOutBasePath, armor_folder, out_file_name)
+    out_armor_path = os.path.join(ndbp, out_file_name)
     with open(out_armor_path, "w", encoding='utf-8') as jsonf:
         json.dump(out_json, jsonf, indent = 4)
 
@@ -78,8 +83,8 @@ def get_files(path) -> list:
     return filenames
 
 
-jsonRawBasePath = r'.\\rawFiles'
-jsonOutBasePath = r'.\\newFiles'
+jsonSourceBasePath = os.path.join(base_path, data_folder_dict.get("jsonSF").get("root"))
+newDataBasePath = os.path.join(base_path, data_folder_dict.get("newSrcDF").get("root"))
 
 
-armor_full_file_etl(jsonRawBasePath, jsonOutBasePath)
+armor_full_file_etl(jsonSourceBasePath, newDataBasePath)
