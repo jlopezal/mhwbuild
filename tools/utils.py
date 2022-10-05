@@ -39,6 +39,8 @@ def createMigrationFolderStruct():
 
     for key in data_folder_dict:
         folder = data_folder_dict.get(key)
+        folder_path = os.path.join(base_path, folder.get("root"))
+        os.makedirs(folder_path, exist_ok=True)
         for subfolder in folder.get("subfolders"):
             folder_path = os.path.join(base_path, folder.get("root"), subfolder)
             os.makedirs(folder_path, exist_ok=True)
@@ -48,6 +50,9 @@ def checkMigrationFolderStruct() -> bool:
     if os.path.exists(base_path):
         for key in data_folder_dict:
             folder = data_folder_dict.get(key)
+            folder_path = os.path.join(base_path, folder.get("root"))
+            if not os.path.exists(folder_path):
+                return False
             for subfolder in folder.get("subfolders"):
                 folder_path = os.path.join(base_path, folder.get("root"), subfolder)
                 if not os.path.exists(folder_path):
